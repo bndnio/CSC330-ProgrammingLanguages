@@ -58,19 +58,53 @@ exception IllegalMove
 (* Part 2 *)
 
 (* 5 *)
-fun card_color(c: card): color = Red
+fun card_color(s: suit, r: rank): color =
+    if s = Diamonds orelse s = Hearts
+    then Red
+    else Black
 
 (* 6 *)
-fun card_value(c: card): rank = Ace
+fun card_value(s: suit, r: rank): int = 
+    case r of
+        Num i => i
+      | (Ace) => 11
+      | (King | Queen | Jack) => 10
 
 (* 7 *)
-fun remove_card(cs: card list, c: card, e) = []
+fun remove_card(cs: card list, c: card, e: exn): card list =
+    case cs of
+        [] => raise e
+      | head::tail =>
+            if head = c
+            then tail
+            else head::remove_card(tail, c, e)
 
 (* 8 *)
-fun all_same_color(cs: card list): bool = false
+fun all_same_color(cs: card list): bool =
+    let
+        fun ***(cs: card list, co: color): bool =
+            case cs of
+                [] => true
+              | head::tail =>
+                    if card_color(head) = co
+                    then ***(tail, co)
+                    else false
+    in
+        case cs of
+            [] => true
+          | head::tail => ***(tail, card_color(head))
+    end
 
 (* 9 *)
-fun sum_cards(cs: card list): int = 0
+fun sum_cards(cs: card list): int = 
+    let
+        fun sum(l, acc) =
+            case l of
+                [] => acc
+              | head::tail => sum(tail, card_value(head)+acc)
+    in
+        sum(cs, 0)
+    end
 
 (* 10 *)
 fun score(cs: card list, g: int): int = 0

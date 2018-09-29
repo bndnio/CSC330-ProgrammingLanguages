@@ -21,6 +21,8 @@ fun all_except_option(s: string, sl: string list): string list option =
         SOME (all_except(s, sl)) handle notFound => NONE
     end
 
+val test1_0 = all_except_option("abc", []) = NONE
+
 (* 2 *)
 fun get_substitutions1(sll: string list list, s: string): string list =
     case sll of
@@ -31,16 +33,40 @@ fun get_substitutions1(sll: string list list, s: string): string list =
                 (* print(String.concatWith ", " (map fn x => x names_without)) *)
             in
                 case names_without of
-                    NONE => []
+                    NONE => get_substitutions1(sll', s)
                   | SOME names => names @ (get_substitutions1(sll', s))
             end
 
-
 (* 3 *)
-fun get_substitutions2(sll: string list list, s: string): string list = []
+fun get_substitutions2(sll: string list list, s: string): string list = 
+    let
+        fun get_substitutions_through_tail(sll: string list list, s: string, osl: string list) =
+            case sll of
+                [] => osl
+              | (sl0::sll') =>
+                    let
+                        val names_without = all_except_option(s, sl0)
+                    in
+                        case names_without of
+                            NONE => get_substitutions_through_tail(sll', s, osl)
+                          | SOME names => (get_substitutions_through_tail(sll', s, osl@names))
+                    end
+    in
+        get_substitutions_through_tail(sll, s, [])
+    end
 
 (* 4 *)
-fun similar_names(sll: string list list, {first: string, middle: string, last: string}) = []
+fun similar_names(sll: string list list, {first: string, middle: string, last: string}) = 
+    let
+        val other_names = get_substitutions2(sll, first)
+        fun convert_to_full_names(names: string list) =
+            case names of
+                [] => []
+              | name::names' =>
+                    {first = name, last = last, middle = middle}::convert_to_full_names(names')
+    in
+        {first = first, last = last, middle = middle}::convert_to_full_names(other_names)
+    end
 
 
 (************************************************************************)
@@ -66,12 +92,16 @@ fun card_color(s: suit, r: rank): color =
     then Red
     else Black
 
+val test5_0 = card_color((Clubs,Ace)) = Black
+
 (* 6 *)
 fun card_value(s: suit, r: rank): int = 
     case r of
         Num i => i
       | (Ace) => 11
       | (King | Queen | Jack) => 10
+
+val test6_0 = card_value((Clubs,Ace)) = 11
 
 (* 7 *)
 fun remove_card(cs: card list, c: card, e: exn): card list =
@@ -81,6 +111,9 @@ fun remove_card(cs: card list, c: card, e: exn): card list =
             if c0 = c
             then cs'
             else c0::remove_card(cs', c, e)
+
+exception notFound
+val test7_0 = remove_card([], (Clubs, Ace), notFound) = [(Clubs, Ace)] handle notFound => true;
 
 (* 8 *)
 fun all_same_color(cs: card list): bool =
@@ -98,6 +131,8 @@ fun all_same_color(cs: card list): bool =
           | c0::cs' => same_colors(cs', card_color(c0))
     end
 
+val test8_0 = all_same_color([]) = true
+
 (* 9 *)
 fun sum_cards(cs: card list): int = 
     let
@@ -108,6 +143,8 @@ fun sum_cards(cs: card list): int =
     in
         sum(cs, 0)
     end
+
+val test9_0 = sum_cards([(Clubs, Ace), (Diamonds, Jack)]) = 21
 
 (* 10 *)
 fun score(cs: card list, g: int): int =
@@ -120,23 +157,23 @@ fun score(cs: card list, g: int): int =
         final_score
     end
 
+val test10_0 = score([], 0) = 0
+
 (* 11 *)
 fun officiate(cs: card list, ml: move list, g: int): int =
     let
         exception IllegalMove
         fun process_game(cs: card list, ml: move list, hc: card list): card list =
-            let
-            in
-                case ml of
-                    [] => hc
-                  | m0::ml' =>
-                        case m0 of
-                            Discard d => process_game(cs, ml', remove_card(hc, d, IllegalMove))
-                          | Draw =>
-                                case cs of
-                                    [] => hc
-                                  | c0::cs' => process_game(cs', ml', c0::hc)
-            end
+            case ml of
+                [] => hc
+                | m0::ml' =>
+                    case m0 of
+                        Discard d => process_game(cs, ml', remove_card(hc, d, IllegalMove))
+                        | Draw =>
+                            case cs of
+                                [] => hc
+                                | c0::cs' => process_game(cs', ml', c0::hc)
+        val sc = score(process_game(cs, ml, []), g)
     in
         score(process_game(cs, ml, []), g)
     end

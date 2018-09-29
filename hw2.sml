@@ -164,15 +164,18 @@ fun officiate(cs: card list, ml: move list, g: int): int =
     let
         exception IllegalMove
         fun process_game(cs: card list, ml: move list, hc: card list): card list =
-            case ml of
-                [] => hc
-                | m0::ml' =>
-                    case m0 of
-                        Discard d => process_game(cs, ml', remove_card(hc, d, IllegalMove))
-                        | Draw =>
-                            case cs of
-                                [] => hc
-                                | c0::cs' => process_game(cs', ml', c0::hc)
+            if sum_cards(hc) > g
+            then hc
+            else
+                case ml of
+                    [] => hc
+                    | m0::ml' =>
+                        case m0 of
+                            Discard d => process_game(cs, ml', remove_card(hc, d, IllegalMove))
+                            | Draw =>
+                                case cs of
+                                    [] => hc
+                                    | c0::cs' => process_game(cs', ml', c0::hc)
         val sc = score(process_game(cs, ml, []), g)
     in
         score(process_game(cs, ml, []), g)

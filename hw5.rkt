@@ -23,10 +23,20 @@
 ;; Problem A
 
 ;; CHANGE (put your solutions here)
-(define (mupllist->racketlist lst)
-  "CHANGE")
+
 (define (racketlist->mupllist lst)
- "CHANGE")
+  (cond [(null? lst) (aunit)]
+        [(pair? (car lst)) (apair (racketlist->mupllist (car lst)) (racketlist->mupllist (cdr lst)))]
+        [#t (apair (car lst) (racketlist->mupllist (cdr lst)))]
+))
+
+
+(define (mupllist->racketlist lst)
+  (cond [(aunit? lst) null]
+        [(apair? (apair-e1 lst)) (cons (mupllist->racketlist (apair-e1 lst)) (mupllist->racketlist (apair-e2 lst)))]
+        [#t (cons (apair-e1 lst) (mupllist->racketlist (apair-e2 lst)))]
+))
+
 
 ;; Problem B
 
@@ -54,6 +64,15 @@
                (error "MUPL addition applied to non-number")))]
         ;; "CHANGE" add more cases here
         ;; one for each type of expression
+        [(int? e) null]
+        [(ifgreater? e) null]
+        [(fun? e) null]
+        [(call? e) null]
+        [(mlet? e) null]
+        [(apair? e) null]
+        [(fst? e) null]
+        [(snd? e) null]
+        [(aunit? e) null]
         [#t (error (format "bad MUPL expression: ~v" e))]))
 
 ;; Do NOT change

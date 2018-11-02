@@ -136,21 +136,13 @@
 
 ;; Problem D
 
-(define mupl-map "CHANGE")
-;; this binding is a bit tricky. it must return a function.
-;; the first two lines should be something like this:
-;;
-;;   (fun "mupl-map" "f"    ;; it is  function "mupl-map" that takes a function f
-;;       (fun #f "lst"      ;; and it returns an anonymous function
-;;          ...
-;;
-;; also remember that we can only call functions with one parameter, but
-;; because they are curried instead of
-;;    (call funexp1 funexp2 exp3)
-;; we do
-;;    (call (call funexp1 funexp2) exp3)
-;; 
+(define mupl-map (fun "mupl-map" "f"
+                      (fun #f "lst" (ifaunit (var "lst")
+                                             (aunit)
+                                             (apair (call (var "f") (fst (var "lst")))
+                                                    (call (call (var "mupl-map") (var "f")) (snd (var "lst"))))))))
 
-(define mupl-mapAddN
+(define mupl-mapAddN 
   (mlet "map" mupl-map
-        "CHANGE (notice map is now in MUPL scope)"))
+        (fun #f "n"
+             (call (var "map") (fun #f "x" (add (var "x") (var "n")))))))

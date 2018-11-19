@@ -141,6 +141,14 @@ class MyBoardChallenge < MyBoard
 end
 
 class MyTetrisChallenge < MyTetris
+  def set_board
+    @canvas = TetrisCanvas.new
+    @board = MyBoardChallenge.new(self)
+    @canvas.place(@board.block_size * @board.num_rows + 3,
+                  @board.block_size * @board.num_columns + 6, 24, 80)
+    @board.draw
+  end
+
   # extend key bindings in MyTetris class
   def key_bindings
     super

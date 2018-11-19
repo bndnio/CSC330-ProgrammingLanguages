@@ -13,6 +13,28 @@ class MyPiece < Piece
       rotations([[0,0], [1,0], [0,1]]),               # short L
       rotations([[0,0], [1,0], [2,0], [0,1], [1,1]])] # short fat L
 
+  
+  # rotate piece 180
+  def rotate_180
+    # Ensures that the flip will always be a possible formation (as opposed 
+    # to nil) by altering the intended coordinates so that it stays 
+    # within the bounds of the rotation array
+    moved = true
+    potential = @all_rotations[(@rotation_index + 2) % @all_rotations.size]
+    # for each individual block in the piece, checks if the intended move
+    # will put this block in an occupied space
+    potential.each{|posns| 
+      if !(@board.empty_at([posns[0] + @base_position[0],
+                            posns[1] + @base_position[1]]));
+        moved = false;  
+      end
+    }
+    if moved
+      @rotation_index = (@rotation_index + 2) % @all_rotations.size
+    end
+    moved
+  end
+
   # class method to choose the next piece
   def self.next_piece (board)
     MyPiece.new(All_My_Pieces.sample, board)
@@ -21,7 +43,6 @@ class MyPiece < Piece
   def size ()
     @all_rotations[0].length()
   end
-
 end
 
 class MyBoard < Board
@@ -32,6 +53,14 @@ class MyBoard < Board
     @game = game
     @delay = 500
   end
+
+  def rotate_180
+    if !game_over? and @game.is_running?
+      @current_block.rotate_180()
+    end
+    draw
+  end
+
 
   # gets the next piece
   def next_piece
@@ -62,6 +91,11 @@ class MyTetris < Tetris
     @canvas.place(@board.block_size * @board.num_rows + 3,
                   @board.block_size * @board.num_columns + 6, 24, 80)
     @board.draw
+  end
+
+  def key_bindings
+    super
+    @root.bind('u', proc {@board.rotate_180})
   end
 end
 

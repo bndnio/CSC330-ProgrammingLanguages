@@ -11,7 +11,7 @@ class MyPiece < Piece
     [[[-2,0], [-1,0], [0,0], [1,0], [2,0]],         # extra long
      [[0,2], [0,1], [0,0], [0,-1], [0,-2]]],
       rotations([[0,0], [1,0], [0,1]]),               # short L
-      rotations([[0,0], [1,0], [2,0], [0,1], [1,1]])] # short fat L
+      rotations([[-1,0], [0,0], [1,0], [-1,1], [0,1]])] # short fat L
 
   
   # rotate piece 180

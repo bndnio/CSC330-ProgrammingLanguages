@@ -13,7 +13,6 @@ class MyPiece < Piece
       rotations([[0,0], [1,0], [0,1]]),               # short L
       rotations([[-1,0], [0,0], [1,0], [-1,1], [0,1]])] # short fat L
 
-  
   # rotate piece 180
   def rotate_180
     # Ensures that the flip will always be a possible formation (as opposed 
@@ -35,6 +34,11 @@ class MyPiece < Piece
     moved
   end
 
+  # class method to genereate a cheat piece
+  def self.cheat_piece (board)
+    MyPiece.new([[[0,0]]], board)
+  end
+
   # class method to choose the next piece
   def self.next_piece (board)
     MyPiece.new(All_My_Pieces.sample, board)
@@ -52,6 +56,7 @@ class MyBoard < Board
     @score = 0
     @game = game
     @delay = 500
+    @cheating = false
   end
 
   def rotate_180
@@ -61,11 +66,27 @@ class MyBoard < Board
     draw
   end
 
-
   # gets the next piece
   def next_piece
-    @current_block = MyPiece.next_piece(self)
+    if @cheating == true
+      @current_block = MyPiece.cheat_piece(self)
+      @cheating = false
+    else
+      @current_block = MyPiece.next_piece(self)
+    end
     @current_pos = nil
+  end
+
+  # gives player 1x1 piece and deducts 100 points
+  # if their score > 100
+  def cheat
+    if !game_over? and @game.is_running?
+      if !@cheating and @score >= 100
+        @cheating = true
+        @score -= 100
+      end
+    end
+    draw
   end
 
   # gets the information from the current piece about where it is and uses this
@@ -96,6 +117,7 @@ class MyTetris < Tetris
   def key_bindings
     super
     @root.bind('u', proc {@board.rotate_180})
+    @root.bind('c', proc {@board.cheat})
   end
 end
 

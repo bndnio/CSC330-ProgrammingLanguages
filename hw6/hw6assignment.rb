@@ -130,12 +130,18 @@ end
 class MyBoardChallenge < MyBoard
   # moves the current piece down
   def move_down
-    if !game_over? and @game.is_running?
+    if @game.is_running?
       ran = @current_block.drop_by_one
-      @current_pos.each{|block| block.remove}
-      @score += 1
-      draw
+      if !ran
+        store_current
+        if !game_over?
+          next_piece
+        end
+      else
+        @score += 1
+      end
       @game.update_score
+      draw
     end
   end
 end

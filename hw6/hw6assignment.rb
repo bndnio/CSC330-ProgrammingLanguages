@@ -59,6 +59,17 @@ class MyBoard < Board
     @cheating = false
   end
 
+  # moves the current piece down
+  def move_down
+    if !game_over? and @game.is_running?
+      ran = @current_block.drop_by_one
+      @current_pos.each{|block| block.remove}
+      @score += 1
+      draw
+      @game.update_score
+    end
+  end
+
   def rotate_180
     if !game_over? and @game.is_running?
       @current_block.rotate_180()
@@ -118,6 +129,7 @@ class MyTetris < Tetris
     super
     @root.bind('u', proc {@board.rotate_180})
     @root.bind('c', proc {@board.cheat})
+    @root.bind('Return', proc {@board.move_down})
   end
 end
 

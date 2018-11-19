@@ -44,6 +44,7 @@ class MyPiece < Piece
     MyPiece.new(All_My_Pieces.sample, board)
   end
 
+  # gets number of blocks in current piece
   def size ()
     @all_rotations[0].length()
   end
@@ -70,6 +71,7 @@ class MyBoard < Board
     end
   end
 
+  # rotates the current piece by 180 degrees
   def rotate_180
     if !game_over? and @game.is_running?
       @current_block.rotate_180()
@@ -125,6 +127,7 @@ class MyTetris < Tetris
     @board.draw
   end
 
+  # extend key bindings in Tetris class
   def key_bindings
     super
     @root.bind('u', proc {@board.rotate_180})

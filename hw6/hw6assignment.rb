@@ -5,7 +5,6 @@
 # part of your solution.
 
 class MyPiece < Piece
-  # The constant All_My_Pieces should be declared here:
 
   All_My_Pieces = Piece::All_Pieces + [
     [[[-2,0], [-1,0], [0,0], [1,0], [2,0]],         # extra long
@@ -51,6 +50,7 @@ class MyPiece < Piece
 end
 
 class MyBoard < Board
+
   def initialize (game)
     @grid = Array.new(num_rows) {Array.new(num_columns)}
     @current_block = MyPiece.next_piece(self)
@@ -107,6 +107,7 @@ class MyBoard < Board
 end
 
 class MyTetris < Tetris
+
   # creates a canvas and the board that interacts with it
   def set_board
     @canvas = TetrisCanvas.new
@@ -128,15 +129,19 @@ class MyPieceChallenge < MyPiece
 end
 
 class MyBoardChallenge < MyBoard
+
   def initialize (game)
     super
+    @preview = MyPreviewWindow.new(game)
     @next_block = MyPieceChallenge.next_piece(self)
+    @preview.set_block(@next_block)
   end
 
   # gets the next piece
   def next_piece
     @current_block = @next_block
     @next_block = MyPieceChallenge.next_piece(self)
+    @preview.set_block(@next_block)
     @current_pos = nil
     @cheating = false
   end
@@ -148,6 +153,7 @@ class MyBoardChallenge < MyBoard
       if !@cheating and @score >= 100
         @cheating = true
         @next_block = MyPieceChallenge.cheat_piece(self)
+        @preview.set_block(@next_block)
         @score -= 100
       end
     end
@@ -173,11 +179,13 @@ class MyBoardChallenge < MyBoard
 end
 
 class MyTetrisChallenge < MyTetris
+
+  # creates a canvas and the board that interacts with it
   def set_board
     @canvas = TetrisCanvas.new
     @board = MyBoardChallenge.new(self)
     @canvas.place(@board.block_size * @board.num_rows + 3,
-                  @board.block_size * @board.num_columns + 6, 24, 80)
+                  @board.block_size * @board.num_columns + 6, 24, 80 + @board.block_size * 5)
     @board.draw
   end
 
@@ -185,6 +193,59 @@ class MyTetrisChallenge < MyTetris
   def key_bindings
     super
     @root.bind('Return', proc {@board.move_down})
+  end
+end
+
+class MyPreviewWindow
+
+  def initialize (game)
+    @game = game
+    @grid = Array.new(num_rows) {Array.new(num_columns)}
+    @canvas = TetrisCanvas.new
+    @canvas.place(block_size * num_rows + 3,
+                  block_size * num_columns + 6, 24, 80)
+  end
+
+  def block_size
+    15
+  end
+  
+  def num_columns
+    10
+  end
+
+  def num_rows
+    5
+  end
+  
+  def set_block (block)
+    @preview_block = block
+    draw
+  end
+
+  # preview_pos holds the intermediate blocks of a piece before they are placed 
+  # in the grid.  If there were any before, they are sent to the piece drawing 
+  # method to be removed and replaced with that of the new position
+  def draw
+    @preview_pos = draw_piece(@preview_block, @preview_pos)
+  end
+
+  # takes a piece and optionally the list of old TetrisRects corresponding
+  # to it and returns a new set of TetrisRects which are how the piece is 
+  # visible to the user.
+  def draw_piece (piece, old=nil)
+    if old != nil and piece.moved
+      old.each{|block| block.remove}
+    end
+    size = block_size
+    blocks = piece.current_rotation
+    start = piece.position
+    blocks.map{|block| 
+    TetrisRect.new(@canvas, start[0]*size + block[0]*size + 3, 
+                       start[1]*size + block[1]*size + 2*size,
+                       start[0]*size + size + block[0]*size + 3, 
+                       start[1]*size + size + block[1]*size + 2*size, 
+                       piece.color)}
   end
 end
 

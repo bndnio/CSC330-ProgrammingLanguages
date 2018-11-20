@@ -2,4 +2,5 @@
 compiled/
 *.zip
 *.rkt~
+.vscode/
 

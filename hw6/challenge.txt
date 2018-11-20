@@ -1,0 +1,33 @@
+There are two further enhancements made in the challenge section:  
+1. Fast Drop (move_down)  
+2. Preview
+
+Fast drop allows the user to press the 'Return' key to drop the current piece 
+by one block. This allows the user to move the piece down into position without 
+hard dropping it straight to the bottom. When using this, the user is awarded 1 point 
+for each drop event, similar to the points awarded when using the hard drop feature 
+with the 'Space' key.  
+This was done by implementing a `move_down` method in `MyBoardChallenge` which when 
+called, calls the `drop_by_one` method in `Piece`. If the resulting position is valid, 
+then the piece is moved and and a point is awarded, otherwise the current location is 
+stored and the `game_over?` method is checked to decide if `next_piece` will be called.
+
+Preview allows the user to see what piece is queued to be next. I was missing this 
+feature when playing on original mode, so I decided to implement it. I did this by 
+slightly modifying the logic behind getting the next piece. Instead of getting the 
+next piece only when needed, the next piece is found early so that it can be displayed. 
+Therefore the program always knows what the next piece will be.  
+This took an update to the `MyBoardChallenge` initializer which had to initialize the 
+preview window by calling `MyPreviewWindow`. Whenever the next piece was going to be 
+pulled into use, it also had to call the new next piece, and pass that to the preview 
+window so it could be shown. This was done in the initializer, `next_piece` method, 
+and the `cheat` method. The Preview window was implemented using a combination of code 
+from the `Tetris` class and the `Board` class, all modified for this specific 
+application. I found that it wasn't worth inheriting from either class because it 
+didn't need all the functionality in either potential parent. And it could be dangerous 
+to have unused methods available that would yield an unintended result. 
+Because of the extra height required from the preview window, the drawing coordinate 
+were modified in `MyTetrisChallenge` so that the grids didn't overlap, and the control 
+buttons had room. Lastly, a tetris root classes called `TetrisRootChallenge` class 
+was created that inherited from `TetrisRoot` in order to override the `TkRoot` call 
+to make the window longer to fix the content.

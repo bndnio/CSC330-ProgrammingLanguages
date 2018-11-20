@@ -1,15 +1,16 @@
 # Programming Languages, Homework 6, hw6runner.rb
+# Brendon Earl, V00797149
 
-# This is the only file you turn in,
-# so do not modify the other files as
-# part of your solution.
+#############################################
+#####         Enhanced Features         #####
+#############################################
 
 class MyPiece < Piece
 
   All_My_Pieces = Piece::All_Pieces + [
-    [[[-2,0], [-1,0], [0,0], [1,0], [2,0]],         # extra long
+    [[[-2,0], [-1,0], [0,0], [1,0], [2,0]],             # extra long
      [[0,2], [0,1], [0,0], [0,-1], [0,-2]]],
-      rotations([[0,0], [1,0], [0,1]]),               # short L
+      rotations([[0,0], [1,0], [0,1]]),                 # short L
       rotations([[-1,0], [0,0], [1,0], [-1,1], [0,1]])] # short fat L
 
   # rotate piece 180
@@ -125,6 +126,21 @@ class MyTetris < Tetris
   end
 end
 
+#############################################
+#####        Challenge Graphics         #####
+#############################################
+
+class TetrisRootChallenge < TetrisRoot
+  def initialize
+  @root = TkRoot.new('height' => 690, 'width' => 205, 
+              'background' => 'lightblue') {title "Tetris"}    
+  end
+end
+
+#############################################
+#####        Challenge Features         #####
+#############################################
+
 class MyPieceChallenge < MyPiece
 end
 
@@ -146,8 +162,7 @@ class MyBoardChallenge < MyBoard
     @cheating = false
   end
 
-  # gives player 1x1 piece and deducts 100 points
-  # if their score > 100
+  # gives player 1x1 piece and deducts 100 points if their score > 100
   def cheat
     if !game_over? and @game.is_running?
       if !@cheating and @score >= 100
@@ -180,12 +195,23 @@ end
 
 class MyTetrisChallenge < MyTetris
 
+  # creates the window and starts the game
+  def initialize
+    @root = TetrisRootEnhanced.new
+    @timer = TetrisTimer.new
+    set_board
+    @running = true
+    key_bindings
+    buttons
+    run_game
+  end
+
   # creates a canvas and the board that interacts with it
   def set_board
     @canvas = TetrisCanvas.new
     @board = MyBoardChallenge.new(self)
     @canvas.place(@board.block_size * @board.num_rows + 3,
-                  @board.block_size * @board.num_columns + 6, 24, 80 + @board.block_size * 5)
+                  @board.block_size * @board.num_columns + 6 , 24, 80 + @board.block_size * MyPreviewWindow::Num_Rows)
     @board.draw
   end
 
@@ -194,29 +220,63 @@ class MyTetrisChallenge < MyTetris
     super
     @root.bind('Return', proc {@board.move_down})
   end
+
+  def buttons
+    pause = TetrisButton.new('pause', 'lightcoral'){self.pause}
+    pause.place(35, 50, 90, 7)
+
+    new_game = TetrisButton.new('new game', 'lightcoral'){self.new_game}
+    new_game.place(35, 75, 15, 7)
+    
+    quit = TetrisButton.new('quit', 'lightcoral'){exitProgram}
+    quit.place(35, 50, 140, 7)
+    
+    ctrl_home_x = 77
+    ctrl_home_y = 611
+    ctrl_btn_w = 50
+    ctrl_btn_h = 35
+    move_left = TetrisButton.new('left', 'lightgreen'){@board.move_left}
+    move_left.place(ctrl_btn_h, ctrl_btn_w, ctrl_home_x-ctrl_btn_w, ctrl_home_y)
+    
+    move_right = TetrisButton.new('right', 'lightgreen'){@board.move_right}
+    move_right.place(ctrl_btn_h, ctrl_btn_w, ctrl_home_x+ctrl_btn_w, ctrl_home_y)
+    
+    rotate_clock = TetrisButton.new('^_)', 'lightgreen'){@board.rotate_clockwise}
+    rotate_clock.place(ctrl_btn_h, ctrl_btn_w, ctrl_home_x, ctrl_home_y-ctrl_btn_h)
+
+    rotate_counter = TetrisButton.new('(_^', 'lightgreen'){
+      @board.rotate_counter_clockwise}
+    rotate_counter.place(ctrl_btn_h, ctrl_btn_w, ctrl_home_x, ctrl_home_y+ctrl_btn_h)
+    
+    drop = TetrisButton.new('drop', 'lightgreen'){@board.drop_all_the_way}
+    drop.place(ctrl_btn_h, ctrl_btn_w, ctrl_home_x, ctrl_home_y)
+
+    label = TetrisLabel.new(@root) do
+      text 'Current Score: '   
+      background 'lightblue'
+    end
+    label.place(35, 100, 26, 45)
+    @score = TetrisLabel.new(@root) do
+      background 'lightblue'
+    end
+    @score.text(@board.score)
+    @score.place(35, 50, 126, 45)    
+  end
 end
 
 class MyPreviewWindow
 
   def initialize (game)
     @game = game
-    @grid = Array.new(num_rows) {Array.new(num_columns)}
+    @grid = Array.new(Num_Rows) {Array.new(Num_Columns)}
     @canvas = TetrisCanvas.new
-    @canvas.place(block_size * num_rows + 3,
-                  block_size * num_columns + 6, 24, 80)
+    @canvas.place(Block_Size * Num_Rows + 3,
+                  Block_Size * Num_Columns + 6, 24, 80)
   end
 
-  def block_size
-    15
-  end
-  
-  def num_columns
-    10
-  end
-
-  def num_rows
-    5
-  end
+  Block_Size = 15
+  Num_Columns = 10
+  Num_Rows = 5
   
   def set_block (block)
     @preview_block = block
@@ -237,7 +297,7 @@ class MyPreviewWindow
     if old != nil and piece.moved
       old.each{|block| block.remove}
     end
-    size = block_size
+    size = Block_Size
     blocks = piece.current_rotation
     start = piece.position
     blocks.map{|block| 
@@ -248,4 +308,3 @@ class MyPreviewWindow
                        piece.color)}
   end
 end
-

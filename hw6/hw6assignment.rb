@@ -128,6 +128,32 @@ class MyPieceChallenge < MyPiece
 end
 
 class MyBoardChallenge < MyBoard
+  def initialize (game)
+    super
+    @next_block = MyPieceChallenge.next_piece(self)
+  end
+
+  # gets the next piece
+  def next_piece
+    @current_block = @next_block
+    @next_block = MyPieceChallenge.next_piece(self)
+    @current_pos = nil
+    @cheating = false
+  end
+
+  # gives player 1x1 piece and deducts 100 points
+  # if their score > 100
+  def cheat
+    if !game_over? and @game.is_running?
+      if !@cheating and @score >= 100
+        @cheating = true
+        @next_block = MyPieceChallenge.cheat_piece(self)
+        @score -= 100
+      end
+    end
+    draw
+  end
+
   # moves the current piece down
   def move_down
     if @game.is_running?
@@ -161,3 +187,4 @@ class MyTetrisChallenge < MyTetris
     @root.bind('Return', proc {@board.move_down})
   end
 end
+

@@ -458,35 +458,30 @@ class Let < GeometryExpression
   end
 
   def shift(dx,dy)
-    raise "bad call to intersect: only for shape values"
+    raise "bad call to shift: only for shape values"
   end
 
   def intersect other
-    # TODO
-    other.intersectNoPoints self # will be NoPoints but follow double-dispatch
+    raise "bad call to intersect: only for shape values"
   end
 
   def intersectPoint p
-    # TODO
-    self # intersection with point and no-points is no-points
+    raise "bad call to intersectPoint: only for shape values"
   end
 
   def intersectLine line
-    # TODO
-    self # intersection with line and no-points is no-points
+    raise "bad call to intersectLine: only for shape values"
   end
 
   def intersectVerticalLine vline
-    # TODO
-    self # intersection with line and no-points is no-points
+    raise "bad call to intersectVertialLine: only for shape values"
   end
 
   # if self is the intersection of (1) some shape s and (2) 
   # the line containing seg, then we return the intersection of the 
   # shape s and the seg.  seg is an instance of LineSegment
   def intersectWithSegmentAsLineResult seg
-    # TODO
-    self
+    raise "bad call to intersectWithSegmentAsLineResult: only for shape values"
   end
 end
 
@@ -508,36 +503,30 @@ class Var < GeometryExpression
   end
 
   def shift(dx,dy)
-    # TODO
-    self # shifting no-points is no-points
+    raise "bad call to shift: only for shape values"
   end
 
   def intersect other
-    # TODO
-    other.intersectNoPoints self # will be NoPoints but follow double-dispatch
+    raise "bad call to intersect: only for shape values"
   end
 
   def intersectPoint p
-    # TODO
-    self # intersection with point and no-points is no-points
+    raise "bad call to intersectPoint: only for shape values"
   end
 
   def intersectLine line
-    # TODO
-    self # intersection with line and no-points is no-points
+    raise "bad call to intersectLine: only for shape values"
   end
 
   def intersectVerticalLine vline
-    # TODO
-    self # intersection with line and no-points is no-points
+    raise "bad call to intersectVertialLine: only for shape values"
   end
 
   # if self is the intersection of (1) some shape s and (2) 
   # the line containing seg, then we return the intersection of the 
   # shape s and the seg.  seg is an instance of LineSegment
   def intersectWithSegmentAsLineResult seg
-    # TODO
-    self
+    raise "bad call to intersectWithSegmentAsLineResult: only for shape values"
   end
 end
 
@@ -559,34 +548,29 @@ class Shift < GeometryExpression
   end
 
   def shift(dx,dy)
-    self # shifting no-points is no-points
+    raise "bad call to shift: only for shape values"
   end
 
   def intersect other
-    # TODO
-    other.intersectNoPoints self # will be NoPoints but follow double-dispatch
+    raise "bad call to intersect: only for shape values"
   end
 
   def intersectPoint p
-    # TODO
-    self # intersection with point and no-points is no-points
+    raise "bad call to intersectPoint: only for shape values"
   end
 
   def intersectLine line
-    # TODO
-    self # intersection with line and no-points is no-points
+    raise "bad call to intersectLine: only for shape values"
   end
 
   def intersectVerticalLine vline
-    # TODO
-    self # intersection with line and no-points is no-points
+    raise "bad call to intersectVerticalLine: only for shape values"
   end
 
   # if self is the intersection of (1) some shape s and (2) 
   # the line containing seg, then we return the intersection of the 
   # shape s and the seg.  seg is an instance of LineSegment
   def intersectWithSegmentAsLineResult seg
-    # TODO
-    self
+    raise "bad call to intersectWithSegmentAsLineResult: only for shape values"
   end
 end

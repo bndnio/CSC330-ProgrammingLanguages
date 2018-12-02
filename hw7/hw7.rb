@@ -151,7 +151,7 @@ class Point < GeometryValue
    if self.real_close(@x,vline.x)
     self
    else
-    NoPoints
+    NoPoints.new
    end
   end
 
@@ -287,12 +287,12 @@ class LineSegment < GeometryValue
   def preprocess_prog
     if self.real_close_point(@x1, @y1, @x2, @y2)
       Point.new((@x1 < @x2 ? @x1 : @x2), (@y1 < @y2 ? @y1 : @y2))
-    elsif @x1 > @x2
+    elsif real_close(@x1, @x2) && @y1 > @y2
       LineSegment.new(@x2, @y2, @x1, @y1)
-    elsif real_close(@x1, @x2) && @y2 > @y1
+    elsif @x1 > @x2 + GeometryExpression::Epsilon
       LineSegment.new(@x2, @y2, @x1, @y1)
     else
-      self
+      LineSegment.new(@x1, @y1, @x2, @y2)
     end
   end
 
@@ -301,7 +301,7 @@ class LineSegment < GeometryValue
   end
 
   def intersect other
-    other.intersectWithSegmentAsLineResult self
+    other.intersectLineSegment self
   end
 
   def intersectPoint p
@@ -317,11 +317,33 @@ class LineSegment < GeometryValue
   end
 
   def intersectLine line
-    self
+    m = (@y2-@y1)/(@x2-@x1)
+    if real_close(line.m, m)
+      b = (@y1-m*@x1)
+      if real_close(line.b, b)
+        LineSegment.new(@x1, @y1, @x2, @y2)
+      else
+        NoPoints.new
+      end
+    elsif (@y1 <= (line.m*@x1+line.b) and @y2 >= (line.m*@x2+line.b)) or (@y1 >= (line.m*@x1+line.b) and @y2 <= (line.m*@x2+line.b))
+        line.intersect(Line.new(m, (@y1-m*@x1)))
+    else
+      NoPoints.new
+    end
   end
 
   def intersectVerticalLine vline
-    self
+    if real_close(@x1, @x2) or (real_close(@x1, vline.x) or real_close(@x2, vline.x))
+      LineSegment.new(@x1, @y1, @x2, @y2)
+    else
+      m = (@y2-@y1)/(@x2-@x1)
+      b = (@y1-m*@x1)
+      if @x1 < vline.x and @x2 > vline.x
+        vline.intersect(Line.new(m, b))
+      else
+        NoPoints.new
+      end
+    end
   end
 
   # if self is the intersection of (1) some shape s and (2) 
